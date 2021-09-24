@@ -225,7 +225,7 @@ namespace mastermind
                                                                    myXpanel.UShortInput[JoinIDOffset + 2].UShortValue,
                                                                    myXpanel.UShortInput[JoinIDOffset + 3].UShortValue);
 
-            // if correct, game over, player wins
+            // check for exact matches
             for (uint i = 0; i < 4; i++)
             {
                 //CrestronConsole.PrintLine("Join ID {0} with guess of {1} is being evaluated", i + JoinIDOffset, myXpanel.UShortInput[i + JoinIDOffset].UShortValue);
@@ -238,7 +238,7 @@ namespace mastermind
                 }
             }
 
-            // if correct, game over, player wins
+            // check for color matches
             for (uint i = 0; i < 4; i++)
             {
                 //CrestronConsole.PrintLine("Join ID {0} with guess of {1} is being evaluated", i + JoinIDOffset, myXpanel.UShortInput[i + JoinIDOffset].UShortValue);

@@ -1,0 +1,4 @@
+gui/output/
+*.c3prj
+*.ASV
+*.hash

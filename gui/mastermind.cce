@@ -1,0 +1,314 @@
+{
+	"Errors": [],
+	"id": "_8wqx67hoz",
+	"name": "mastermind",
+	"description": "Contract for mastermind C#",
+	"company": "Spye",
+	"client": "Spye",
+	"author": "Tony Petrangelo",
+	"version": "1.0.0.0",
+	"schemaVersion": 1,
+	"subContractLinks": [],
+	"subContracts": [],
+	"specifications": [
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_u17sogmys",
+			"componentId": "_q2px7k945",
+			"instanceName": "ClueSpot",
+			"numberOfInstances": 40
+		},
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_aap3fmtba",
+			"componentId": "_oyphl5vsq",
+			"instanceName": "ColorSelect",
+			"numberOfInstances": 6
+		},
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_f6wnn33pn",
+			"componentId": "_pop3ufmeq",
+			"instanceName": "Game",
+			"numberOfInstances": 1
+		},
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_t036yh6ty",
+			"componentId": "_64o3ogjik",
+			"instanceName": "GuessSpot",
+			"numberOfInstances": 40
+		},
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_rp6jotd1m",
+			"componentId": "_bv3284vdj",
+			"instanceName": "SolutionSpot",
+			"numberOfInstances": 4
+		}
+	],
+	"components": [
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_q2px7k945",
+			"name": "ClueSpot",
+			"commands": [
+				{
+					"Errors": [],
+					"name": "Color_FB",
+					"siblingId": "_3biz0hhdl",
+					"dataType": 2,
+					"notes": "The type of clue to set the feedback to",
+					"id": "_tkozf8qga",
+					"parentId": "_q2px7k945",
+					"attributeType": 0
+				},
+				{
+					"Errors": [],
+					"name": "Enabled_FB",
+					"siblingId": "_xhv4si6iq",
+					"dataType": 1,
+					"notes": "For enabling the clue spot when needed",
+					"id": "_ubebnj3e3",
+					"parentId": "_q2px7k945",
+					"attributeType": 0
+				}
+			],
+			"feedbacks": [
+				{
+					"Errors": [],
+					"name": "",
+					"siblingId": "_tkozf8qga",
+					"dataType": 2,
+					"notes": "",
+					"id": "_3biz0hhdl",
+					"parentId": "_q2px7k945",
+					"attributeType": 1
+				},
+				{
+					"Errors": [],
+					"name": "",
+					"siblingId": "_ubebnj3e3",
+					"dataType": 1,
+					"notes": "",
+					"id": "_xhv4si6iq",
+					"parentId": "_q2px7k945",
+					"attributeType": 1
+				}
+			],
+			"specifications": []
+		},
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_oyphl5vsq",
+			"name": "ColorSelect",
+			"commands": [
+				{
+					"Errors": [],
+					"name": "Selected_FB",
+					"siblingId": "_ufximkzef",
+					"dataType": 1,
+					"notes": "Shows which color is selected",
+					"id": "_7t94shnn4",
+					"parentId": "_oyphl5vsq",
+					"attributeType": 0
+				}
+			],
+			"feedbacks": [
+				{
+					"Errors": [],
+					"name": "Selected",
+					"siblingId": "_7t94shnn4",
+					"dataType": 1,
+					"notes": "The color has been selected",
+					"id": "_ufximkzef",
+					"parentId": "_oyphl5vsq",
+					"attributeType": 1
+				}
+			],
+			"specifications": []
+		},
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_pop3ufmeq",
+			"name": "Game",
+			"commands": [
+				{
+					"Errors": [],
+					"name": "",
+					"siblingId": "_jg8u8rcmr",
+					"dataType": 1,
+					"notes": "",
+					"id": "_e0gxg7vci",
+					"parentId": "_pop3ufmeq",
+					"attributeType": 0
+				},
+				{
+					"Errors": [],
+					"name": "",
+					"siblingId": "_6yenurf11",
+					"dataType": 1,
+					"notes": "",
+					"id": "_qvd2qpjj6",
+					"parentId": "_pop3ufmeq",
+					"attributeType": 0
+				},
+				{
+					"Errors": [],
+					"name": "Message_FB",
+					"siblingId": "_88xk4azre",
+					"dataType": 3,
+					"notes": "Messages to the player",
+					"id": "_efeotcvg6",
+					"parentId": "_pop3ufmeq",
+					"attributeType": 0
+				}
+			],
+			"feedbacks": [
+				{
+					"Errors": [],
+					"name": "Submit",
+					"siblingId": "_e0gxg7vci",
+					"dataType": 1,
+					"notes": "Answer has been submitted",
+					"id": "_jg8u8rcmr",
+					"parentId": "_pop3ufmeq",
+					"attributeType": 1
+				},
+				{
+					"Errors": [],
+					"name": "New",
+					"siblingId": "_qvd2qpjj6",
+					"dataType": 1,
+					"notes": "New game",
+					"id": "_6yenurf11",
+					"parentId": "_pop3ufmeq",
+					"attributeType": 1
+				},
+				{
+					"Errors": [],
+					"name": "",
+					"siblingId": "_efeotcvg6",
+					"dataType": 0,
+					"notes": "",
+					"id": "_88xk4azre",
+					"parentId": "_pop3ufmeq",
+					"attributeType": 1
+				}
+			],
+			"specifications": []
+		},
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_64o3ogjik",
+			"name": "GuessSpot",
+			"description": "A spot where a single color guess is made",
+			"commands": [
+				{
+					"Errors": [],
+					"name": "Color_FB",
+					"siblingId": "_sq2nqbwiu",
+					"dataType": 2,
+					"notes": "The selected color or 0 for no selection",
+					"id": "_42h3qyl99",
+					"parentId": "_64o3ogjik",
+					"attributeType": 0
+				},
+				{
+					"Errors": [],
+					"name": "Enabled_FB",
+					"siblingId": "_mx6q4emyw",
+					"dataType": 1,
+					"notes": "",
+					"id": "_z0vynpwmp",
+					"parentId": "_64o3ogjik",
+					"attributeType": 0
+				},
+				{
+					"Errors": [],
+					"name": "",
+					"siblingId": "_sw4c2mzsy",
+					"dataType": 1,
+					"notes": "",
+					"id": "_29oh1wm0i",
+					"parentId": "_64o3ogjik",
+					"attributeType": 0
+				}
+			],
+			"feedbacks": [
+				{
+					"Errors": [],
+					"name": "",
+					"siblingId": "_42h3qyl99",
+					"dataType": 2,
+					"notes": "Th",
+					"id": "_sq2nqbwiu",
+					"parentId": "_64o3ogjik",
+					"attributeType": 1
+				},
+				{
+					"Errors": [],
+					"name": "",
+					"siblingId": "_z0vynpwmp",
+					"dataType": 1,
+					"notes": "",
+					"id": "_mx6q4emyw",
+					"parentId": "_64o3ogjik",
+					"attributeType": 1
+				},
+				{
+					"Errors": [],
+					"name": "Selected",
+					"siblingId": "_29oh1wm0i",
+					"dataType": 1,
+					"notes": "The guess spot selected to add color to",
+					"id": "_sw4c2mzsy",
+					"parentId": "_64o3ogjik",
+					"attributeType": 1
+				}
+			],
+			"specifications": []
+		},
+		{
+			"Errors": [],
+			"parentId": "_8wqx67hoz",
+			"id": "_bv3284vdj",
+			"name": "SolutionSpot",
+			"commands": [
+				{
+					"Errors": [],
+					"name": "Color_FB",
+					"siblingId": "_x8zdq0qav",
+					"dataType": 2,
+					"notes": "For showing the solution when the problem is solved or the player runs out of turns",
+					"id": "_y9d9jl313",
+					"parentId": "_bv3284vdj",
+					"attributeType": 0
+				}
+			],
+			"feedbacks": [
+				{
+					"Errors": [],
+					"name": "",
+					"siblingId": "_y9d9jl313",
+					"dataType": 2,
+					"notes": "",
+					"id": "_x8zdq0qav",
+					"parentId": "_bv3284vdj",
+					"attributeType": 1
+				}
+			],
+			"specifications": []
+		}
+	],
+	"allComponentsForAllContracts": []
+}
