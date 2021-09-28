@@ -1,4 +1,14 @@
+# SIMPL Windows
+SPlsWork/
+*.ASV
+*.chd?
+*.lpz
+*.hash
+*.sig
+*.sm2
+*.smft
+*.zip
+
+# GUI stuff
 gui/output/
 *.c3prj
-*.ASV
-*.hash

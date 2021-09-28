@@ -19,6 +19,7 @@ namespace mastermind
         ushort SelectedColor = 0;
         int[] Solution = { 0, 0, 0, 0 };
         bool GameOver = false;
+        uint GuessSize = 4;
 
         public ControlSystem()
             : base()
@@ -111,7 +112,7 @@ namespace mastermind
                                     if (GameOver == false)
                                     {
                                         // check if this is a spot on the current answer level
-                                        if (args.Sig.Number > 10 + ((AnswerLevel - 1) * 4) && args.Sig.Number < 11 + (AnswerLevel * 4))
+                                        if (args.Sig.Number > 10 + ((AnswerLevel - 1) * GuessSize) && args.Sig.Number < 11 + (AnswerLevel * GuessSize))
                                         {
                                             myXpanel.UShortInput[args.Sig.Number].UShortValue = SelectedColor;
                                         }
@@ -177,7 +178,7 @@ namespace mastermind
 
             // get solution
             Random random = new Random();
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < GuessSize; i++)
             {
                 Solution[i] = random.Next(1, 7);
             }
@@ -216,8 +217,9 @@ namespace mastermind
         public void EvalAnswer()
         {
             int[] Clues = { 0, 0, 0, 0 };
-            bool[] ClueUsed = { false, false, false, false };
-            uint JoinIDOffset = (AnswerLevel * 4) + 7;
+            bool[] SolutionSpotUsed = { false, false, false, false };
+            bool[] GuessSpotUsed = { false, false, false, false };
+            uint JoinIDOffset = (AnswerLevel * GuessSize) + 7;
             
             CrestronConsole.PrintLine("Solution: {0}, {1}, {2}, {3}", Solution[0], Solution[1], Solution[2], Solution[3]);
             CrestronConsole.PrintLine("Guess: {0}, {1}, {2}, {3}", myXpanel.UShortInput[JoinIDOffset].UShortValue, 
@@ -226,34 +228,37 @@ namespace mastermind
                                                                    myXpanel.UShortInput[JoinIDOffset + 3].UShortValue);
 
             // check for exact matches
-            for (uint i = 0; i < 4; i++)
+            for (uint i = 0; i < GuessSize; i++)
             {
                 //CrestronConsole.PrintLine("Join ID {0} with guess of {1} is being evaluated", i + JoinIDOffset, myXpanel.UShortInput[i + JoinIDOffset].UShortValue);
                 
                 if (myXpanel.UShortInput[i + JoinIDOffset].UShortValue == Solution[i])
                 {
                     Clues[i] = 2;
-                    ClueUsed[i] = true;
-                    //CrestronConsole.PrintLine("Exact Match for Join ID {0}", i + JoinIDOffset);
+                    SolutionSpotUsed[i] = true;
+                    GuessSpotUsed[i] = true;
+                    CrestronConsole.PrintLine("Exact Match for Join ID {0}", i + JoinIDOffset);
                 }
             }
+            CrestronConsole.PrintLine("State after exact match loop; Clues: {0}, SpotUsed: {1}", Clues, SolutionSpotUsed);
 
             // check for color matches
-            for (uint i = 0; i < 4; i++)
+            for (uint i = 0; i < GuessSize; i++)
             {
                 //CrestronConsole.PrintLine("Join ID {0} with guess of {1} is being evaluated", i + JoinIDOffset, myXpanel.UShortInput[i + JoinIDOffset].UShortValue);
 
-                for (uint x = 0; x < 4; x++)
+                for (uint x = 0; x < GuessSize; x++)
                 {
                     //CrestronConsole.PrintLine("Join ID {0} with guess of {1} is being evaluated", i + JoinIDOffset, myXpanel.UShortInput[i + JoinIDOffset].UShortValue);
 
-                    if (i != x && ClueUsed[i] == false)
+                    if (SolutionSpotUsed[i] == false && GuessSpotUsed[x] == false)
                     {
-                        if (myXpanel.UShortInput[i + JoinIDOffset].UShortValue == Solution[x])
+                        if (myXpanel.UShortInput[x + JoinIDOffset].UShortValue == Solution[i])
                         {
                             Clues[i] = 1;
-                            ClueUsed[i] = true;
-                            //CrestronConsole.PrintLine("Color Match for Join ID {0}", i + JoinIDOffset);
+                            SolutionSpotUsed[i] = true;
+                            GuessSpotUsed[x] = true;
+                            CrestronConsole.PrintLine("Color Match for Join ID {0}", i + JoinIDOffset);
                         }
                     }
                 }
@@ -287,25 +292,25 @@ namespace mastermind
                     CrestronConsole.PrintLine("Clues sorted: {0}, {1}, {2}, {3}", Clues[0], Clues[1], Clues[2], Clues[3]);
 
                     // enable the next level of guess spots
-                    for (uint i = 0; i < 4; i++)
+                    for (uint i = 0; i < GuessSize; i++)
                     {
-                        JoinID = (51 + (AnswerLevel * 4)) + i;
+                        JoinID = (51 + (AnswerLevel * GuessSize)) + i;
                         myXpanel.BooleanInput[JoinID].BoolValue = true;
                         //CrestronConsole.PrintLine("Enable Join: {0}", JoinID);
                     }
 
                     // enable clue feedback buttons
-                    for (uint i = 0; i < 4; i++)
+                    for (uint i = 0; i < GuessSize; i++)
                     {
-                        JoinID = (87 + (AnswerLevel * 4)) + i;
+                        JoinID = (87 + (AnswerLevel * GuessSize)) + i;
                         myXpanel.BooleanInput[JoinID].BoolValue = true;
                         //CrestronConsole.PrintLine("Clue Enable JoinID {0}", JoinID);
                     }
 
                     // show the clues
-                    for (uint i = 0; i < 4; i++)
+                    for (uint i = 0; i < GuessSize; i++)
                     {
-                        JoinID = 47 + (AnswerLevel * 4) + i;
+                        JoinID = 47 + (AnswerLevel * GuessSize) + i;
                         myXpanel.UShortInput[JoinID].UShortValue = (ushort)Clues[i];
                         //CrestronConsole.PrintLine("Clue Feedback JoinID {0}", JoinID);
                     }
