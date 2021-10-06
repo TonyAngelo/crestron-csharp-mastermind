@@ -241,6 +241,7 @@ namespace mastermind
             // set local variables
             AnswerLevel = 1;
             GameOver = false;
+            Array.Clear(Guess, 0, Guess.Length);
 
             // setup panel for new game
             xPanel.UShortInput[2].UShortValue = 0;
