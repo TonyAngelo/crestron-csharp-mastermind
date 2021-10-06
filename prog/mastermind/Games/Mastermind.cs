@@ -64,76 +64,88 @@ namespace mastermind.Games
             // make sure the game is over
             if (GameOver == false)
             {
-                // init the clue finding vars
-                bool[] SolutionSpotUsed = { false, false, false, false };
-                bool[] GuessSpotUsed = { false, false, false, false };
+                bool CompleteGuess = true;
 
-                CrestronConsole.PrintLine("Solution: {0}, {1}, {2}, {3}", Solution[0], Solution[1], Solution[2], Solution[3]);
-                CrestronConsole.PrintLine("Guess: {0}, {1}, {2}, {3}", guess[0], guess[1], guess[2], guess[3]);
-
-                // clear the clues
-                Array.Clear(Clues, 0, Clues.Length);
-
-                // check for exact matches
-                for (uint i = 0; i < GuessSize; i++)
+                // make sure all guess spots have a color guess
+                for(int i = 0; i < GuessSize; i++)
                 {
-                    if (guess[i] == Solution[i])
+                    if(guess[i] == 0)
                     {
-                        Clues[i] = 2;
-                        SolutionSpotUsed[i] = true;
-                        GuessSpotUsed[i] = true;
+                        CompleteGuess = false;
+                        break;
                     }
                 }
 
-                // check for color matches
-                for (uint i = 0; i < GuessSize; i++)
+                if (CompleteGuess)
                 {
-                    for (uint x = 0; x < GuessSize; x++)
+                    // init the clue finding vars
+                    bool[] SolutionSpotUsed = { false, false, false, false };
+                    bool[] GuessSpotUsed = { false, false, false, false };
+
+                    CrestronConsole.PrintLine("Solution: {0}, {1}, {2}, {3}", Solution[0], Solution[1], Solution[2], Solution[3]);
+                    CrestronConsole.PrintLine("Guess: {0}, {1}, {2}, {3}", guess[0], guess[1], guess[2], guess[3]);
+
+                    // clear the clues
+                    Array.Clear(Clues, 0, Clues.Length);
+
+                    // check for exact matches
+                    for (uint i = 0; i < GuessSize; i++)
                     {
-                        if (SolutionSpotUsed[i] == false && GuessSpotUsed[x] == false)
+                        if (guess[i] == Solution[i])
                         {
-                            if (guess[x] == Solution[i])
+                            Clues[i] = 2;
+                            SolutionSpotUsed[i] = true;
+                            GuessSpotUsed[i] = true;
+                        }
+                    }
+
+                    // check for color matches
+                    for (uint i = 0; i < GuessSize; i++)
+                    {
+                        for (uint x = 0; x < GuessSize; x++)
+                        {
+                            if (SolutionSpotUsed[i] == false && GuessSpotUsed[x] == false)
                             {
-                                Clues[i] = 1;
-                                SolutionSpotUsed[i] = true;
-                                GuessSpotUsed[x] = true;
+                                if (guess[x] == Solution[i])
+                                {
+                                    Clues[i] = 1;
+                                    SolutionSpotUsed[i] = true;
+                                    GuessSpotUsed[x] = true;
+                                }
                             }
                         }
                     }
-                }
 
-                if (Clues.Sum() == (GuessSize * 2)) // correct answer
-                {
-                    CrestronConsole.PrintLine("Correct Answer!");
-
-                    // end the game
-                    OnMastermindEvent(new MastermindEventArgs() { Update = "Winner", Solution = Solution });
-                }
-                else // incorrect answer
-                {
-                    if (AnswerLevel == MaxGuesses) // no more guesses, reveal answer
+                    if (Clues.Sum() == (GuessSize * 2)) // correct answer
                     {
-                        CrestronConsole.PrintLine("No more guesses, game over.");
+                        CrestronConsole.PrintLine("Correct Answer!");
 
                         // end the game
-                        OnMastermindEvent(new MastermindEventArgs() { Update = "Loser", Solution = Solution });
+                        OnMastermindEvent(new MastermindEventArgs() { Update = "Winner", Solution = Solution });
                     }
-                    else // update game with clues and the next set of guess spots
+                    else // incorrect answer
                     {
-                        //CrestronConsole.PrintLine("Incorrect Answer.");
+                        if (AnswerLevel == MaxGuesses) // no more guesses, reveal answer
+                        {
+                            CrestronConsole.PrintLine("No more guesses, game over.");
 
-                        // sort the clue array
-                        Array.Sort(Clues);
-                        Array.Reverse(Clues);
+                            // end the game
+                            OnMastermindEvent(new MastermindEventArgs() { Update = "Loser", Solution = Solution });
+                        }
+                        else // update game with clues and the next set of guess spots
+                        {
+                            // sort the clue array
+                            Array.Sort(Clues);
+                            Array.Reverse(Clues);
 
-                        CrestronConsole.PrintLine("Clues sorted: {0}, {1}, {2}, {3}", Clues[0], Clues[1], Clues[2], Clues[3]);
+                            CrestronConsole.PrintLine("Clues sorted: {0}, {1}, {2}, {3}", Clues[0], Clues[1], Clues[2], Clues[3]);
 
-                        // update the answer level
-                        AnswerLevel = (ushort)(AnswerLevel + 1);
-                        //CrestronConsole.PrintLine("AnswerLevel: {0}", AnswerLevel);
+                            // update the answer level
+                            AnswerLevel = (ushort)(AnswerLevel + 1);
 
-                        // update the panel
-                        OnMastermindEvent(new MastermindEventArgs() { Update = "NewClues", Clues = Clues, AnswerLevel = AnswerLevel});
+                            // update the panel
+                            OnMastermindEvent(new MastermindEventArgs() { Update = "NewClues", Clues = Clues, AnswerLevel = AnswerLevel });
+                        }
                     }
                 }
             }

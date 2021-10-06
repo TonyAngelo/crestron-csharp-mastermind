@@ -123,17 +123,7 @@ namespace mastermind
                                 }
                                 else if (args.Sig.Number == 3) // submit answer
                                 {
-                                    for (uint i = 0; i < GuessSize; i++)
-                                    {
-                                        if(Guess[i] == 0)
-                                        {
-                                            break;
-                                        }
-                                        else if (i + 1 == GuessSize)
-                                        {
-                                            Game.EvalAnswer(Guess);
-                                        }
-                                    }
+                                    Game.EvalAnswer(Guess);
                                 }
                                 else if (args.Sig.Number > 3 && args.Sig.Number < 10) // color selection
                                 {
