@@ -54,7 +54,7 @@ namespace mastermind.Games
 
         public int SetGuessSpot(uint spot)
         {
-            if (GameOver == false)
+            if (GameOver == false && SelectedColor > 0)
             {
                 // check if this is a spot on the current answer level
                 if (spot > ((AnswerLevel - 1) * GuessSize) && spot < 1 + (AnswerLevel * GuessSize))
