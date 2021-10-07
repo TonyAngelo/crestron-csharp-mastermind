@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Crestron.SimplSharp;                          	// For Basic SIMPL# Classes
 using Crestron.SimplSharpPro;                       	// For Basic SIMPL#Pro classes
 using Crestron.SimplSharpPro.CrestronThread;        	// For Threading
@@ -16,16 +15,8 @@ namespace mastermind
         XpanelForSmartGraphics myXpanel;
 
         // game
-        Mastermind Game = new Mastermind();
-
-        public uint SelectedColor = 0;
-        public int[] Guess = { 0, 0, 0, 0 };
-        public uint AnswerLevel;
-        public bool GameOver;
-        public uint GuessSize;
-        private int NumberOfColors;
-        private int MaxGuesses;
-
+        Mastermind Game;
+        MastermindGUI<XpanelForSmartGraphics> GUI;
 
         public ControlSystem()
             : base()
@@ -34,25 +25,30 @@ namespace mastermind
             {
                 Thread.MaxNumberOfUserThreads = 20;
 
+                // instantiate the game and register the callback
+                Game = new Mastermind();
                 Game.MastermindEvent += Mastermind_Event;
 
                 // Hardware instantiation
                 if (this.SupportsEthernet)
                 {
+                    // instantiate the panel and set the description
                     myXpanel = new XpanelForSmartGraphics(0x05, this);
                     myXpanel.Description = "Games Xpanel";
 
-                    // subscribe to events, then register
+                    // register, then subscribe to events 
                     if (myXpanel.Register() != eDeviceRegistrationUnRegistrationResponse.Success)
                     {
-                        ErrorLog.Error("Error registering {0}, err = {1}", myXpanel.Description, myXpanel.RegistrationFailureReason);
+                        ErrorLog.Error("Error registering {0}, Error: {1}", myXpanel.Description, myXpanel.RegistrationFailureReason);
                     }
                     else
                     {
-                        myXpanel.SigChange += MyXpanel_SigChange;
-                        myXpanel.OnlineStatusChange += MyXpanel_OnlineStatusChange;
+                        myXpanel.SigChange += PanelSigChange;
+                        myXpanel.OnlineStatusChange += PanelOnlineStatusChange;
                     }
 
+                    // mastermindGUI class takes two parameters, the xpanel and the joinID at which the buttons begin
+                    GUI = new MastermindGUI<XpanelForSmartGraphics>(myXpanel, 1);
                 }
             }
             catch (Exception e)
@@ -63,50 +59,44 @@ namespace mastermind
 
         public void Mastermind_Event(object sender, MastermindEventArgs e)
         {
-            CrestronConsole.PrintLine("Mastermind_Event sender: {0}, args: {1}", sender, e.Update);
+            //CrestronConsole.PrintLine("Mastermind_Event sender: {0}, args: {1}", sender, e.Update);
             if(e.Update == "NewGame")
             {
-                GuessSize = e.GuessSize;
-                NumberOfColors = e.NumberOfColors;
-                MaxGuesses = e.MaxGuesses;
-                NewGame(myXpanel);
+                GUI.NewGame(e.NumberOfColors, e.MaxGuesses, e.GuessSize);
             }
             else if(e.Update == "NewClues")
             {
-                AnswerLevel = e.AnswerLevel;
-                ShowNewClues(myXpanel, e.Clues);
+                GUI.ShowNewClues(e.Clues, e.AnswerLevel);
             }
             else if (e.Update == "Loser")
             {
-                myXpanel.StringInput[1].StringValue = "Out of turns, try again.";
-                EndGame(myXpanel, e.Solution);
+                GUI.EndGame("Out of turns, try again.", e.Solution);
             }
             else if (e.Update == "Winner")
             {
-                myXpanel.StringInput[1].StringValue = "You got it right!";
-                EndGame(myXpanel, e.Solution);
+                GUI.EndGame("You solved the code!", e.Solution);
             }
         }
 
-        private void MyXpanel_OnlineStatusChange(GenericBase currentDevice, OnlineOfflineEventArgs args)
+        private void PanelOnlineStatusChange(GenericBase currentDevice, OnlineOfflineEventArgs args)
         {
-            CrestronConsole.PrintLine("OnlineStatusChange Args: {0}", args.ToString());
-
+            //CrestronConsole.PrintLine("PanelOnlineStatusChange: {0}, Online: {1}", currentDevice.Description, args.DeviceOnLine);
             if (currentDevice == myXpanel)
             {
                 if (args.DeviceOnLine)
                 {
-                    ErrorLog.Notice("myXpanel is Online!");
+                    ErrorLog.Notice("{0} is Online!", currentDevice.Description);
                 }
                 else
                 {
-                    ErrorLog.Error("myXpanel is Offline!");
+                    ErrorLog.Error("{0} is Offline!", currentDevice.Description);
                 }
             }
         }
 
-        private void MyXpanel_SigChange(BasicTriList currentDevice, SigEventArgs args)
+        private void PanelSigChange(BasicTriList currentDevice, SigEventArgs args)
         {
+            //CrestronConsole.PrintLine("PanelSigChange: {0}, Type: {1}", currentDevice.Description, args.Sig.Type);
             if (currentDevice == myXpanel)
             {
                 switch (args.Sig.Type)
@@ -117,21 +107,25 @@ namespace mastermind
                         {
                             if (args.Sig.BoolValue == true)
                             {
-                                if (args.Sig.Number == 2) // new game
+                                if (args.Sig.Number == 1) // help
+                                {
+                                    // not implemented
+                                }
+                                else if (args.Sig.Number == 2) // new game
                                 {
                                     Game.NewGame();
                                 }
                                 else if (args.Sig.Number == 3) // submit answer
                                 {
-                                    Game.EvalAnswer(Guess);
+                                    Game.EvalAnswer(GUI.Guess);
                                 }
                                 else if (args.Sig.Number > 3 && args.Sig.Number < 10) // color selection
                                 {
-                                    SetColorSelection(myXpanel, args.Sig.Number - 3);
+                                    GUI.SetColorSelection(args.Sig.Number - 3);
                                 }
                                 else if (args.Sig.Number > 10 && args.Sig.Number < 51) // answer spot
                                 {
-                                    SetGuessSpot(myXpanel, args.Sig.Number);
+                                    GUI.SetGuessSpot(args.Sig.Number - 10);
                                 }
                             }
                             break;
@@ -146,126 +140,11 @@ namespace mastermind
             }
         }
 
-        public void SetColorSelection(XpanelForSmartGraphics xPanel, uint color)
-        {
-            if (GameOver == false)
-            {
-                // set global variable
-                SelectedColor = color;
-                
-                // turn on feedback for selected color and turn off feedback for the rest
-                for (uint i = 1; i < NumberOfColors + 1; i++)
-                {
-                    if (SelectedColor == i)
-                    {
-                        xPanel.BooleanInput[i + 3].BoolValue = true;
-                    }
-                    else
-                    {
-                        xPanel.BooleanInput[i + 3].BoolValue = false;
-                    }
-                }
-            }
-        }
-
-        public void SetGuessSpot(XpanelForSmartGraphics xPanel, uint spot)
-        {
-            if (GameOver == false)
-            {
-                // check if this is a spot on the current answer level
-                if (spot > 10 + ((AnswerLevel - 1) * GuessSize) && spot < 11 + (AnswerLevel * GuessSize))
-                {
-                    // set guess spot to color
-                    Guess[spot - (11 + ((AnswerLevel - 1) * GuessSize))] = Convert.ToUInt16(SelectedColor);
-                    // set the touch panel to the color
-                    xPanel.UShortInput[spot].UShortValue = Convert.ToUInt16(SelectedColor);
-                }
-            }
-        }
-
-        private void ShowNewClues(XpanelForSmartGraphics xPanel, int[] clues)
-        {
-            for (uint i = 0; i < GuessSize; i++)
-            {
-                // enable the next level of guess spots
-                xPanel.BooleanInput[(51 + ((AnswerLevel - 1) * GuessSize)) + i].BoolValue = true;
-                // enable clue feedback buttons
-                xPanel.BooleanInput[(87 + ((AnswerLevel - 1) * GuessSize)) + i].BoolValue = true;
-                // show the clues
-                xPanel.UShortInput[47 + ((AnswerLevel - 1) * GuessSize) + i].UShortValue = (ushort)clues[i];
-            }
-            // if this is the last guess
-            if(AnswerLevel == MaxGuesses)
-            {
-                xPanel.StringInput[1].StringValue = String.Format("Last attempt, make it count!");
-            }
-            else
-            {
-                xPanel.StringInput[1].StringValue = String.Format("Try again, turn {0}", AnswerLevel);
-            }
-        }
-
-        private void ShowAnswer(XpanelForSmartGraphics xPanel, int[] solution)
-        {
-            // show the answer
-            for (uint i = 0; i < GuessSize + 1; i++)
-            {
-                xPanel.UShortInput[i + 91].UShortValue = (ushort)solution[i];
-            }
-        }
-
-        private void EndGame(XpanelForSmartGraphics xPanel, int[] solution)
-        {
-            // set game over var
-            GameOver = true;
-            // mark game as over
-            xPanel.UShortInput[2].UShortValue = 1;
-            // show answer
-            ShowAnswer(xPanel, solution);
-            // deselect color
-            SetColorSelection(xPanel, 0);
-        }
-
-        public void NewGame(XpanelForSmartGraphics xPanel)
-        {
-            // set local variables
-            AnswerLevel = 1;
-            GameOver = false;
-            Array.Clear(Guess, 0, Guess.Length);
-
-            // setup panel for new game
-            xPanel.UShortInput[2].UShortValue = 0;
-            
-            // reset feedback on color options
-            SetColorSelection(xPanel, 0);
-
-            // reset guess and clue and solution feedback spots
-            for (uint i = 11; i < 95; i++)
-            {
-                xPanel.UShortInput[i].UShortValue = 0;
-            }
-
-            // enable the first four guess sports
-            for (uint i = 51; i < 55; i++)
-            {
-                xPanel.BooleanInput[i].BoolValue = true;
-            }
-
-            // disable the rest of the guess spots and all the clue spots
-            for (uint i = 55; i < 131; i++)
-            {
-                xPanel.BooleanInput[i].BoolValue = false;
-            }
-
-            // update the panel
-            xPanel.StringInput[1].StringValue = String.Format("New Game, turn {0}", AnswerLevel);
-        }
-
         public override void InitializeSystem()
         {
             try
             {
-                CrestronConsole.PrintLine("System initialized, starting new game...");
+                //CrestronConsole.PrintLine("System initialized, starting new game...");
                 Game.NewGame();
             }
             catch (Exception e)
